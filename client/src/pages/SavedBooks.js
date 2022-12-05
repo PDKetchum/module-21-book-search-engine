@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Jumbotron,
   Container,
@@ -7,11 +7,11 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { getMe, deleteBook } from "../utils/API";
+// import { getMe, deleteBook } from "../utils/API";
 import Auth from "../utils/auth";
 import { removeBookId } from "../utils/localStorage";
 
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { useQuery } from "@apollo/client";
 
@@ -23,6 +23,7 @@ const SavedBooks = () => {
   // const [userData, setUserData] = useState({});
   const [{ loading, data }] = useQuery(GET_ME);
   const userData = data?.user || [];
+  const [remove, { error }] = useMutation(REMOVE_BOOK);
   // use this to determine if `useEffect()` hook needs to run again
   // const userDataLength = Object.keys(userData).length;
 
@@ -60,14 +61,14 @@ const SavedBooks = () => {
     }
 
     try {
-      const response = await deleteBook(bookId, token);
+      const response = await remove(bookId, token);
 
       if (!response.ok) {
         throw new Error("something went wrong!");
       }
 
       const updatedUser = await response.json();
-      setUserData(updatedUser);
+      // setUserData(updatedUser);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -122,6 +123,7 @@ const SavedBooks = () => {
           })}
         </CardColumns>
       </Container>
+      {error && <div>Something went wrong...</div>}
     </>
   );
 };
