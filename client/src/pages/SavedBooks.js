@@ -13,8 +13,11 @@ import { removeBookId } from "../utils/localStorage";
 
 import { useParams } from "react-router-dom";
 import { useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 
-import { SAVE_BOOK } from "../utils/mutations";
+import { REMOVE_BOOK } from "../utils/mutations";
+
+import { GET_ME } from "../utils/queries";
 
 const SavedBooks = () => {
   const [userData, setUserData] = useState({});
