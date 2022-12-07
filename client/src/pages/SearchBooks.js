@@ -164,7 +164,7 @@ const SearchBooks = () => {
           </Container>
         </>
       ) : (
-        <div>{error.message}</div>
+        error && <div>{error.message}</div>
       )}
     </>
   );

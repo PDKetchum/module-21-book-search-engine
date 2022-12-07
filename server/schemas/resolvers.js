@@ -1,5 +1,5 @@
 const { AuthenticationError } = require("apollo-server-express");
-const { User, Book } = require("../models");
+const { User } = require("../models");
 const { signToken } = require("../utils/auth");
 
 const resolvers = {
@@ -10,12 +10,12 @@ const resolvers = {
       }
       throw new AuthenticationError("You need to be logged in!");
     },
-    users: async () => {
-      return User.find().populate("books");
-    },
-    user: async (parent, { username }) => {
-      return User.findOne({ username }).populate("books");
-    },
+    // users: async () => {
+    //   return User.find().populate("books");
+    // },
+    // user: async (parent, { username }) => {
+    //   return User.findOne({ username }).populate("books");
+    // },
   },
   Mutation: {
     login: async (parent, { email, password }) => {
@@ -36,7 +36,9 @@ const resolvers = {
       return { token, user };
     },
     addUser: async (parent, { username, email, password }) => {
+      console.log(`${username} - ${email} - ${password}`);
       const user = await User.create({ username, email, password });
+      console.log(user);
       const token = signToken(user);
       return { token, user };
     },
@@ -46,18 +48,20 @@ const resolvers = {
       context
     ) => {
       if (context.user) {
-        const book = await Book.create({
-          bookId,
-          authors,
-          description,
-          title,
-          image,
-          link,
-        });
-
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: book._id } },
+          {
+            $addToSet: {
+              savedBooks: {
+                bookId: bookId,
+                authors: [authors],
+                description: description,
+                title: title,
+                image: image,
+                link: link,
+              },
+            },
+          },
           { new: true, runValidators: true }
         );
         return updatedUser;
@@ -66,13 +70,9 @@ const resolvers = {
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const book = await Thought.findOneAndDelete({
-          bookId: bookId,
-        });
-
         const updatedUser = User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: book.bookId } },
+          { $pull: { savedBooks: { bookId: bookId } } },
           { new: true, runValidators: true }
         );
 
