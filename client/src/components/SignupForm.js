@@ -26,7 +26,7 @@ const SignupForm = () => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
-
+  console.log(userFormData);
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
@@ -36,7 +36,7 @@ const SignupForm = () => {
       event.preventDefault();
       event.stopPropagation();
     }
-
+    console.log(userFormData);
     try {
       // const response = await createUser(userFormData);
       const { data } = await addUser({
